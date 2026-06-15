@@ -74,9 +74,19 @@ public:
     Interpreter();
     virtual ~Interpreter() = default;
 
-    // Registers routines, initializes module-level data, then calls
-    // `entryProc` (default "main", case-insensitive). Throws
+    // Registers PROC/FUNC declarations and initializes module-level
+    // PERS/CONST/VAR from `module` into the global scope. Can be called
+    // multiple times to layer several modules - e.g. a "system" module
+    // with predefined speeddata/zonedata/tooldata (v1000, z50, tool0, ...)
+    // loaded before the user's module.
+    void load(RapidParser::RapidModuleContext* module);
+
+    // Calls `entryProc` (default "main", case-insensitive). The routine
+    // must have been registered by a previous load(). Throws
     // std::runtime_error on any unhandled runtime error.
+    void call(const std::string& entryProc = "main");
+
+    // Convenience: load(module); call(entryProc);
     void run(RapidParser::RapidModuleContext* module, const std::string& entryProc = "main");
 
     // Global (module-level) scope - exposed for inspection/tests.

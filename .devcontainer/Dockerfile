@@ -3,7 +3,7 @@
 # Provides:
 #  - build-essential / cmake / ninja / git -> CMake + ExternalAntlr4Cpp
 #    (clones & builds the ANTLR4 C++ runtime from GitHub on first configure)
-#  - default-jre-headless                  -> runs tools/antlr-4.13.2-complete.jar
+#  - default-jre-headless                  -> runs tools/antlr-4.13.1-complete.jar
 #
 # No X11 / CImg dependencies: this image is purely for lexing/parsing RAPID
 # source (.mod / .prg / .sys), not for any graphical output.
@@ -25,10 +25,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Bundle the ANTLR tool jar (needed to generate RapidLexer/RapidParser from
 # Rapid.g4). CMakeLists.txt falls back to this path if no
-# tools/antlr-4.13.2-complete.jar is found in the project itself.
+# tools/antlr-4.13.1-complete.jar is found in the project itself.
 RUN mkdir -p /opt/antlr \
-    && wget -q https://www.antlr.org/download/antlr-4.13.2-complete.jar \
-            -O /opt/antlr/antlr-4.13.2-complete.jar
+    && wget -q https://www.antlr.org/download/antlr-4.13.1-complete.jar \
+            -O /opt/antlr/antlr-4.13.1-complete.jar
 
 # --- Non-root user so VS Code Dev Containers can attach cleanly ---------
 # ubuntu:24.04 already ships a non-root "ubuntu" user with UID/GID 1000,

@@ -30,7 +30,7 @@ Interpreter::Interpreter() {
 // Setup / entry point
 // ===========================================================================
 
-void Interpreter::run(RapidParser::RapidModuleContext* module, const std::string& entryProc) {
+void Interpreter::load(RapidParser::RapidModuleContext* module) {
     auto* mod = module->moduleDeclaration();
 
     for (auto* rd : mod->routineDeclaration()) {
@@ -46,7 +46,9 @@ void Interpreter::run(RapidParser::RapidModuleContext* module, const std::string
     for (auto* dd : mod->dataDeclaration()) {
         declareData(dd, globals_);
     }
+}
 
+void Interpreter::call(const std::string& entryProc) {
     auto it = procedures_.find(Environment::normalize(entryProc));
     if (it == procedures_.end()) {
         throw error("entry procedure '" + entryProc + "' not found");
@@ -68,6 +70,11 @@ void Interpreter::run(RapidParser::RapidModuleContext* module, const std::string
         throw err;
     }
     callStack_.pop_back();
+}
+
+void Interpreter::run(RapidParser::RapidModuleContext* module, const std::string& entryProc) {
+    load(module);
+    call(entryProc);
 }
 
 void Interpreter::declareData(RapidParser::DataDeclarationContext* ctx, Environment& env) {

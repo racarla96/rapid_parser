@@ -3,10 +3,6 @@
 Entorno headless (sin ventana/GUI) para parsear RAPID con ANTLR4 + C++17,
 listo para VS Code Dev Containers.
 
-## TODOs
-
-- [ ] Definir variables que ya vienen predefinidas en el sistema, tipo v1500, ejemplo.
-
 ## Estructura
 
 ```
@@ -24,7 +20,7 @@ rapid_parser/
 ├── examples/
 │   └── sample.mod
 ├── cmake/             <- módulos oficiales ExternalAntlr4Cpp / FindANTLR
-└── tools/             <- (opcional) tu propio antlr-4.13.2-complete.jar
+└── tools/             <- (opcional) tu propio antlr-4.13.1-complete.jar
 ```
 
 ## Qué se eliminó respecto a la versión "Scene" original
@@ -47,9 +43,9 @@ runtime ANTLR4 C++ + tu gramática `Rapid.g4`.
 `cmake/ExternalAntlr4Cpp.cmake` y `cmake/FindANTLR.cmake` ya están incluidos
 (copiados sin modificar desde
 https://github.com/gabriele-tomassetti/antlr-cpp/tree/master/cmake), y el
-jar `antlr-4.13.2-complete.jar` se descarga durante el build de la imagen
+jar `antlr-4.13.1-complete.jar` se descarga durante el build de la imagen
 Docker a `/opt/antlr/`. `CMakeLists.txt` lo usa automáticamente si no existe
-un `tools/antlr-4.13.2-complete.jar` propio en el proyecto.
+un `tools/antlr-4.13.1-complete.jar` propio en el proyecto.
 
 ## Build
 
@@ -76,7 +72,7 @@ para regenerar el lexer/parser en `generated/` cada vez que guardes
 
 Para regenerar manualmente sin CMake:
 ```bash
-java -jar tools/antlr-4.13.2-complete.jar -Dlanguage=Cpp -no-listener -visitor -o generated Rapid.g4
+java -jar tools/antlr-4.13.1-complete.jar -Dlanguage=Cpp -no-listener -visitor -o generated Rapid.g4
 ```
 
 ## Sobre `Rapid.g4`
@@ -163,7 +159,37 @@ simula la espera real, solo registra que se alcanzó).
   un valor escalar por defecto en lugar de un array del tamaño declarado.
 - `DIV` usa redondeo hacia `-∞` (`floor`); `MOD` usa `fmod` de C++.
 
-### Aviso sobre la verificación de compilación
+### Datos predefinidos del sistema (`v1000`, `z50`, `tool0`, `wobj0`, ...)
+
+En el controlador real, valores como `v1000`, `z50`, `fine`, `tool0` o
+`wobj0` no son "magia" del lenguaje: están declarados como `CONST`/`PERS`
+en un módulo de sistema (`BASE.sys`, `SYSMODULE`) que se carga antes que tus
+módulos de usuario. Aquí se resuelve igual:
+
+- `examples/BASE.sys` contiene las `speeddata` predefinidas (`v5`...`v7000`),
+  las `zonedata` predefinidas (`fine`, `z0`...`z200`) y `tool0`/`wobj0`,
+  escritas en RAPID normal (`CONST speeddata v1000 := [1000,500,5000,1000];`,
+  etc.) - son simplemente literales `[...]`, que el intérprete representa
+  como `Value::Array` igual que cualquier otro agregado.
+- `Interpreter::load(tree)` registra `PROC`/`FUNC` e inicializa los datos de
+  nivel de módulo de un árbol **sin** ejecutar nada; se puede llamar varias
+  veces para "apilar" módulos. `Interpreter::call(entry)` ejecuta la rutina
+  de entrada. `run()` sigue existiendo como `load()+call()`.
+- `main.cpp` añade `--system=FICHERO` (repetible) para cargar uno o más
+  módulos de sistema antes que `<file.mod>`:
+
+```bash
+./rapid_parser --system=../examples/BASE.sys ../examples/sample.mod
+```
+
+Si quieres añadir tus propias constantes/herramientas/`wobj`/velocidades
+("config" de tu célula), la forma más simple es exactamente esta: un
+fichero `.sys` adicional (p. ej. `examples/MiCelda.sys`) con sus propios
+`CONST`/`PERS`, cargado con otro `--system=`. No hace falta tocar C++ para
+esto - solo para añadir *builtins* (funciones/procedimientos nuevos), que sí
+van en `registerBuiltins()` (`Interpreter.cpp`).
+
+
 
 `Interpreter.hpp`/`Interpreter.cpp` se verificaron con
 `g++ -fsyntax-only -std=c++17 -Wall -Wextra` contra un *mock* local del API
@@ -176,3 +202,4 @@ devcontainer (con el `generated/RapidParser.h` real) aparece algún error de
 accesor (p. ej. un nombre de método distinto al esperado), es casi seguro
 algo puntual y fácil de corregir - compárte el mensaje de `g++` y lo
 ajustamos contra el `RapidParser.h` real.
+

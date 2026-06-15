@@ -25,7 +25,7 @@ file(GLOB ANTLR_JAR_CANDIDATES "${CMAKE_CURRENT_SOURCE_DIR}/tools/antlr-*-comple
 if(ANTLR_JAR_CANDIDATES)
   list(GET ANTLR_JAR_CANDIDATES 0 ANTLR_EXECUTABLE)
 else()
-  set(ANTLR_EXECUTABLE /opt/antlr/antlr-4.13.2-complete.jar)
+  set(ANTLR_EXECUTABLE /opt/antlr/antlr-4.13.1-complete.jar)
 endif()
 find_package(ANTLR REQUIRED)
 
