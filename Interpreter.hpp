@@ -43,7 +43,7 @@ namespace rapid {
 // Arguments to a Move instruction, evaluated and ready to use.
 // `targets` has 1 element for MoveAbsJ/MoveJ/MoveL, 2 for MoveC
 // (CirPoint, ToPoint). Optional fields that weren't supplied remain
-// Value::undefined().
+// Value::undefined(). `line` is the 1-based source line of the instruction.
 struct MoveArgs {
     std::vector<Value> targets;
     Value speed;
@@ -54,6 +54,7 @@ struct MoveArgs {
     Value tOverride;   // \T:=...
     Value zOverride;   // \Z:=...
     bool conc = false; // leading \Conc
+    size_t line = 0;
 };
 
 // ---- Control-flow signals (thrown, caught at the appropriate level) -------
@@ -68,6 +69,9 @@ struct ExitSignal {};
 struct GotoSignal {
     std::string label;
 };
+
+// Thrown by the step debugger's 'q'/'quit' command to abort execution.
+struct DebugQuitSignal {};
 
 class Interpreter {
 public:
@@ -94,6 +98,19 @@ public:
 
     // The current execution stack (routine names, outermost first).
     const std::vector<std::string>& callStack() const { return callStack_; }
+
+    // "[Main->Estrella]" style call-chain label, used in trace output and
+    // by the step debugger.
+    std::string traceLabel() const;
+
+    // Enables/disables the interactive step debugger (see debugPause()).
+    // Reads commands from stdin, writes prompts/output to stderr.
+    void setStepping(bool enabled) { stepping_ = enabled; }
+
+    // Source lines of the main module (1-based via sourceLineFor()), used
+    // to show "the line of code" alongside Move traces and step-debugger
+    // prompts. Optional - if never set, that part of the output is omitted.
+    void setSourceLines(std::vector<std::string> lines) { sourceLines_ = std::move(lines); }
 
 protected:
     // Called for every executed Move instruction. Default implementation
@@ -172,8 +189,19 @@ private:
     static std::string unescapeRapidString(const std::string& raw);
     std::runtime_error error(const std::string& msg) const;
 
+    // ---- step debugger ----
+    // Returns the trimmed source line for 1-based `line`, or "" if
+    // sourceLines_ wasn't set or `line` is out of range.
+    std::string sourceLineFor(size_t line) const;
+    // Called from execStatement() when stepping_ is true. Prints the
+    // current location and blocks on a command from stdin (step/continue/
+    // print/backtrace/quit/help). Returns once execution should proceed.
+    void debugPause(RapidParser::StatementContext* ctx, Environment& env);
+
     Environment globals_;
     std::vector<std::string> callStack_;
+    bool stepping_ = false;
+    std::vector<std::string> sourceLines_;
 
     std::unordered_map<std::string, RapidParser::ProcedureDeclarationContext*> procedures_;
     std::unordered_map<std::string, RapidParser::FunctionDeclarationContext*> functions_;

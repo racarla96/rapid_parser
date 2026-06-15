@@ -203,3 +203,45 @@ accesor (p. ej. un nombre de método distinto al esperado), es casi seguro
 algo puntual y fácil de corregir - compárte el mensaje de `g++` y lo
 ajustamos contra el `RapidParser.h` real.
 
+### Traza de llamadas y línea de código en `[Move]`
+
+Cada línea `[Move]` ahora empieza con el **call stack actual** entre
+corchetes (`[Main->ESTRELLA]`, igual que `Interpreter::callStack()` /
+`traceLabel()`), el número de línea, y - si el archivo principal se cargó
+con su texto fuente (siempre, vía `setSourceLines()`) - la propia línea de
+código tal cual aparece en el `.mod`:
+
+```
+[Main->ESTRELLA] L23 (MoveAbsJ pHome,v1000,fine,FRESA\Wobj:=MCSMILL;): [Move] MoveAbsJ target=... speed=...
+```
+
+Esto es solo para el módulo "principal" (`<file.mod>`); si una rutina de un
+`--system=` module hiciera Move (no es el caso de `BASE.sys`), la línea
+seguiría siendo correcta pero no se mostraría el texto fuente
+(`sourceLineFor` solo conoce las líneas del fichero principal).
+
+### Ejecución paso a paso (`--step`)
+
+```bash
+./rapid_parser --step --system=../examples/BASE.sys ../examples/P7.PRG
+```
+
+Con `--step`, antes de ejecutar **cada sentencia** el intérprete imprime por
+`stderr` el call stack, la línea y el código fuente, y espera un comando por
+`stdin`:
+
+- `<Enter>` / `s` / `n` - ejecuta esta sentencia y vuelve a pausar en la
+  siguiente ("step").
+- `c` - continúa sin volver a pausar (ejecuta el resto normal).
+- `p <variable>` - imprime el valor actual de una variable visible (local o
+  global) sin avanzar.
+- `bt` - muestra el call stack actual.
+- `q` - aborta la ejecución (`[debug] execution aborted by user ('q')`).
+- `h` - ayuda.
+
+La salida del programa (`[Move]`, `TPWrite`, `WaitTime`) sigue yendo a
+`stdout`, así que se puede redirigir aparte de los prompts del depurador:
+
+```bash
+./rapid_parser --step ../examples/P7.PRG 1> trace.log
+```

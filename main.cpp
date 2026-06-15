@@ -2,7 +2,8 @@
 //
 // Driver for the RAPID parser/interpreter generated from Rapid.g4.
 //
-// Usage: rapid_parser <file.mod> [--system=FILE]... [--tokens] [--tree] [--no-run] [--entry=ProcName]
+// Usage: rapid_parser <file.mod> [--system=FILE]... [--tokens] [--tree]
+//                      [--no-run] [--entry=ProcName] [--step]
 //
 //   --system=FILE    load a "system" module first (e.g. predefined
 //                     speeddata/zonedata/tooldata such as v1000, z50, tool0,
@@ -13,14 +14,19 @@
 //   --tree           print the ANTLR parse tree for <file.mod>
 //   --no-run         don't execute the program (default: run PROC <entry>)
 //   --entry=Name     entry procedure to call (default: main)
+//   --step           interactive step debugger: pause before each
+//                     statement, read commands from stdin (h for help)
 //
 // With no flags, the file is parsed silently and PROC main (if present) is
-// executed by the interpreter.
+// executed by the interpreter. Move-instruction traces always show the
+// call chain ([Main->Estrella]), source line number, and (if available)
+// the source line text.
 
 #include <fstream>
 #include <iostream>
 #include <memory>
 #include <sstream>
+#include <string>
 #include <vector>
 
 #include "antlr4-runtime.h"
@@ -36,7 +42,8 @@ namespace {
 // lifetime of the program (PROC/FUNC declarations registered by
 // Interpreter::load() hold raw pointers into this tree).
 struct ParsedModule {
-    std::ifstream stream;
+    std::string source;
+    std::vector<std::string> lines; // source split by '\n', for --step / Move traces
     std::unique_ptr<ANTLRInputStream> input;
     std::unique_ptr<RapidLexer> lexer;
     std::unique_ptr<CommonTokenStream> tokens;
@@ -47,13 +54,22 @@ struct ParsedModule {
 // Parses `path` into `out`. Prints an error and returns false on failure
 // (file not found or syntax errors).
 bool parseFile(const std::string& path, ParsedModule& out) {
-    out.stream.open(path);
-    if (!out.stream.is_open()) {
+    std::ifstream stream(path);
+    if (!stream.is_open()) {
         std::cerr << "Could not open file: " << path << std::endl;
         return false;
     }
 
-    out.input = std::make_unique<ANTLRInputStream>(out.stream);
+    std::ostringstream contents;
+    contents << stream.rdbuf();
+    out.source = contents.str();
+
+    out.lines.clear();
+    std::istringstream lineStream(out.source);
+    std::string line;
+    while (std::getline(lineStream, line)) out.lines.push_back(line);
+
+    out.input = std::make_unique<ANTLRInputStream>(out.source);
     out.lexer = std::make_unique<RapidLexer>(out.input.get());
     out.tokens = std::make_unique<CommonTokenStream>(out.lexer.get());
     out.parser = std::make_unique<RapidParser>(out.tokens.get());
@@ -73,7 +89,8 @@ bool parseFile(const std::string& path, ParsedModule& out) {
 int main(int argc, const char* argv[]) {
     if (argc < 2) {
         std::cerr << "Usage: " << argv[0]
-                  << " <file.mod> [--system=FILE]... [--tokens] [--tree] [--no-run] [--entry=ProcName]"
+                  << " <file.mod> [--system=FILE]... [--tokens] [--tree]"
+                  << " [--no-run] [--entry=ProcName] [--step]"
                   << std::endl;
         return 1;
     }
@@ -81,6 +98,7 @@ int main(int argc, const char* argv[]) {
     bool showTokens = false;
     bool showTree = false;
     bool doRun = true;
+    bool step = false;
     std::string entry = "main";
     std::vector<std::string> systemFiles;
 
@@ -92,6 +110,8 @@ int main(int argc, const char* argv[]) {
             showTree = true;
         } else if (arg == "--no-run") {
             doRun = false;
+        } else if (arg == "--step") {
+            step = true;
         } else if (arg.rfind("--entry=", 0) == 0) {
             entry = arg.substr(8);
         } else if (arg.rfind("--system=", 0) == 0) {
@@ -126,6 +146,11 @@ int main(int argc, const char* argv[]) {
         std::cout << "\nParse tree:\n"
                   << mainModule.tree->toStringTree(mainModule.parser.get()) << std::endl;
     }
+
+    // Source lines power the "(source line text)" shown in Move traces and
+    // in the --step debugger prompt.
+    interpreter.setSourceLines(mainModule.lines);
+    if (step) interpreter.setStepping(true);
 
     interpreter.load(mainModule.tree);
 

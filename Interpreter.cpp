@@ -64,6 +64,8 @@ void Interpreter::call(const std::string& entryProc) {
         // RETURN from the entry procedure: normal termination.
     } catch (ExitSignal&) {
         // EXIT: normal termination.
+    } catch (DebugQuitSignal&) {
+        std::cerr << "[debug] execution aborted by user ('q')" << std::endl;
     } catch (GotoSignal& g) {
         auto err = error("label '" + g.label + "' not found in '" + entryProc + "'");
         callStack_.pop_back();
@@ -127,6 +129,8 @@ void Interpreter::execStatements(const std::vector<RapidParser::StatementContext
 }
 
 void Interpreter::execStatement(RapidParser::StatementContext* ctx, Environment& env) {
+    if (stepping_) debugPause(ctx, env);
+
     if (auto* c = ctx->dataDeclaration())        { declareData(c, env); return; }
     if (auto* c = ctx->assignmentStatement())    { execAssignment(c, env); return; }
     if (auto* c = ctx->moveAbsJStatement())      { execMoveAbsJ(c, env); return; }
@@ -350,29 +354,36 @@ MoveArgs Interpreter::evalMoveArgs(const std::vector<RapidParser::NamedOrPositio
 void Interpreter::execMoveAbsJ(RapidParser::MoveAbsJStatementContext* ctx, Environment& env) {
     MoveArgs m = evalMoveArgs(ctx->namedOrPositionalExpr(), ctx->switchExpr(), 1, env);
     if (ctx->IDENTIFIER()) m.conc = true;
+    m.line = ctx->getStart()->getLine();
     onMove("MoveAbsJ", m);
 }
 
 void Interpreter::execMoveJ(RapidParser::MoveJStatementContext* ctx, Environment& env) {
     MoveArgs m = evalMoveArgs(ctx->namedOrPositionalExpr(), ctx->switchExpr(), 1, env);
     if (ctx->IDENTIFIER()) m.conc = true;
+    m.line = ctx->getStart()->getLine();
     onMove("MoveJ", m);
 }
 
 void Interpreter::execMoveL(RapidParser::MoveLStatementContext* ctx, Environment& env) {
     MoveArgs m = evalMoveArgs(ctx->namedOrPositionalExpr(), ctx->switchExpr(), 1, env);
     if (ctx->IDENTIFIER()) m.conc = true;
+    m.line = ctx->getStart()->getLine();
     onMove("MoveL", m);
 }
 
 void Interpreter::execMoveC(RapidParser::MoveCStatementContext* ctx, Environment& env) {
     MoveArgs m = evalMoveArgs(ctx->namedOrPositionalExpr(), ctx->switchExpr(), 2, env);
     if (ctx->IDENTIFIER()) m.conc = true;
+    m.line = ctx->getStart()->getLine();
     onMove("MoveC", m);
 }
 
 void Interpreter::onMove(const std::string& instructionName, const MoveArgs& args) {
-    std::cout << "[Move] " << instructionName << " ";
+    std::cout << traceLabel() << " L" << args.line;
+    const std::string src = sourceLineFor(args.line);
+    if (!src.empty()) std::cout << " (" << src << ")";
+    std::cout << ": [Move] " << instructionName << " ";
     if (args.targets.size() == 1) {
         std::cout << "target=" << args.targets[0].toDisplayString();
     } else if (args.targets.size() == 2) {
@@ -758,6 +769,82 @@ std::runtime_error Interpreter::error(const std::string& msg) const {
         os << ")";
     }
     return std::runtime_error(os.str());
+}
+
+std::string Interpreter::traceLabel() const {
+    std::ostringstream os;
+    os << "[";
+    for (size_t i = 0; i < callStack_.size(); ++i) {
+        if (i) os << "->";
+        os << callStack_[i];
+    }
+    os << "]";
+    return os.str();
+}
+
+std::string Interpreter::sourceLineFor(size_t line) const {
+    if (line < 1 || line > sourceLines_.size()) return "";
+    const std::string& s = sourceLines_[line - 1];
+    const size_t start = s.find_first_not_of(" \t");
+    if (start == std::string::npos) return "";
+    const size_t end = s.find_last_not_of(" \t\r");
+    return s.substr(start, end - start + 1);
+}
+
+// ===========================================================================
+// Step debugger
+// ===========================================================================
+
+void Interpreter::debugPause(RapidParser::StatementContext* ctx, Environment& env) {
+    const size_t line = ctx->getStart()->getLine();
+    while (true) {
+        std::cerr << traceLabel() << " L" << line;
+        const std::string src = sourceLineFor(line);
+        if (!src.empty()) std::cerr << ": " << src;
+        std::cerr << std::endl << "(step) > " << std::flush;
+
+        std::string cmd;
+        if (!std::getline(std::cin, cmd)) {
+            // stdin closed (e.g. piped input ran out): stop stepping and
+            // run the rest of the program normally.
+            stepping_ = false;
+            std::cerr << std::endl;
+            return;
+        }
+
+        const size_t a = cmd.find_first_not_of(" \t\r");
+        if (a == std::string::npos) return; // blank line: step
+        const size_t b = cmd.find_last_not_of(" \t\r");
+        cmd = cmd.substr(a, b - a + 1);
+
+        if (cmd == "s" || cmd == "n" || cmd == "step") return;
+        if (cmd == "c" || cmd == "continue") { stepping_ = false; return; }
+        if (cmd == "q" || cmd == "quit") throw DebugQuitSignal{};
+
+        if (cmd == "bt" || cmd == "stack" || cmd == "where") {
+            std::cerr << "  " << traceLabel() << std::endl;
+            continue;
+        }
+
+        if (cmd == "h" || cmd == "help" || cmd == "?") {
+            std::cerr << "  <enter>/s/n  step to the next statement\n"
+                         "  c            continue without stepping\n"
+                         "  p <var>      print the current value of a variable\n"
+                         "  bt           show the call stack\n"
+                         "  q            abort execution"
+                      << std::endl;
+            continue;
+        }
+
+        if (cmd.rfind("p ", 0) == 0 || cmd.rfind("print ", 0) == 0) {
+            const std::string name = cmd.substr(cmd.find(' ') + 1);
+            Value* v = env.find(name);
+            std::cerr << "  " << name << " = " << (v ? v->toDisplayString() : "<undefined>") << std::endl;
+            continue;
+        }
+
+        std::cerr << "  unknown command '" << cmd << "' (h for help)" << std::endl;
+    }
 }
 
 // ===========================================================================
