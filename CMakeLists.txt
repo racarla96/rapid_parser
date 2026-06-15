@@ -25,7 +25,7 @@ file(GLOB ANTLR_JAR_CANDIDATES "${CMAKE_CURRENT_SOURCE_DIR}/tools/antlr-*-comple
 if(ANTLR_JAR_CANDIDATES)
   list(GET ANTLR_JAR_CANDIDATES 0 ANTLR_EXECUTABLE)
 else()
-  set(ANTLR_EXECUTABLE /opt/antlr/antlr-4.13.1-complete.jar)
+  set(ANTLR_EXECUTABLE /opt/antlr/antlr-4.13.2-complete.jar)
 endif()
 find_package(ANTLR REQUIRED)
 
@@ -38,6 +38,7 @@ include_directories(${PROJECT_SOURCE_DIR}
 # --- Executable -------------------------------------------------------------
 add_executable(rapid_parser
     main.cpp
+    Interpreter.cpp
     ${ANTLR_RapidGrammar_CXX_OUTPUTS})
 
 target_link_libraries(rapid_parser antlr4_static)

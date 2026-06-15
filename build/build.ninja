@@ -12,7 +12,7 @@
 
 # =============================================================================
 # Project: rapid_parser
-# Configurations: 
+# Configurations: Debug
 # =============================================================================
 
 #############################################
@@ -20,6 +20,11 @@
 
 ninja_required_version = 1.5
 
+
+#############################################
+# Set configuration variable for custom commands.
+
+CONFIGURATION = Debug
 # =============================================================================
 # Include auxiliary files.
 
@@ -62,42 +67,50 @@ build antlr4_runtime-build_shared: phony CMakeFiles/antlr4_runtime-build_shared 
 
 build cmake_object_order_depends_target_rapid_parser: phony || /workspaces/rapid_parser/generated/RapidBaseVisitor.cpp /workspaces/rapid_parser/generated/RapidBaseVisitor.h /workspaces/rapid_parser/generated/RapidLexer.cpp /workspaces/rapid_parser/generated/RapidLexer.h /workspaces/rapid_parser/generated/RapidLexer.interp /workspaces/rapid_parser/generated/RapidLexer.tokens /workspaces/rapid_parser/generated/RapidParser.cpp /workspaces/rapid_parser/generated/RapidParser.h /workspaces/rapid_parser/generated/RapidVisitor.cpp /workspaces/rapid_parser/generated/RapidVisitor.h antlr4_runtime-build_static
 
-build CMakeFiles/rapid_parser.dir/main.cpp.o: CXX_COMPILER__rapid_parser_unscanned_ /workspaces/rapid_parser/main.cpp || cmake_object_order_depends_target_rapid_parser
+build CMakeFiles/rapid_parser.dir/main.cpp.o: CXX_COMPILER__rapid_parser_unscanned_Debug /workspaces/rapid_parser/main.cpp || cmake_object_order_depends_target_rapid_parser
   DEFINES = -DANTLR4CPP_STATIC
   DEP_FILE = CMakeFiles/rapid_parser.dir/main.cpp.o.d
-  FLAGS = -std=gnu++17
+  FLAGS = -g -std=gnu++17
   INCLUDES = -I/workspaces/rapid_parser -I/workspaces/rapid_parser/generated -isystem /workspaces/rapid_parser/build/antlr4_runtime/src/antlr4_runtime/runtime/Cpp/runtime/src
   OBJECT_DIR = CMakeFiles/rapid_parser.dir
   OBJECT_FILE_DIR = CMakeFiles/rapid_parser.dir
 
-build CMakeFiles/rapid_parser.dir/generated/RapidLexer.cpp.o: CXX_COMPILER__rapid_parser_unscanned_ /workspaces/rapid_parser/generated/RapidLexer.cpp || cmake_object_order_depends_target_rapid_parser
+build CMakeFiles/rapid_parser.dir/Interpreter.cpp.o: CXX_COMPILER__rapid_parser_unscanned_Debug /workspaces/rapid_parser/Interpreter.cpp || cmake_object_order_depends_target_rapid_parser
+  DEFINES = -DANTLR4CPP_STATIC
+  DEP_FILE = CMakeFiles/rapid_parser.dir/Interpreter.cpp.o.d
+  FLAGS = -g -std=gnu++17
+  INCLUDES = -I/workspaces/rapid_parser -I/workspaces/rapid_parser/generated -isystem /workspaces/rapid_parser/build/antlr4_runtime/src/antlr4_runtime/runtime/Cpp/runtime/src
+  OBJECT_DIR = CMakeFiles/rapid_parser.dir
+  OBJECT_FILE_DIR = CMakeFiles/rapid_parser.dir
+
+build CMakeFiles/rapid_parser.dir/generated/RapidLexer.cpp.o: CXX_COMPILER__rapid_parser_unscanned_Debug /workspaces/rapid_parser/generated/RapidLexer.cpp || cmake_object_order_depends_target_rapid_parser
   DEFINES = -DANTLR4CPP_STATIC
   DEP_FILE = CMakeFiles/rapid_parser.dir/generated/RapidLexer.cpp.o.d
-  FLAGS = -std=gnu++17
+  FLAGS = -g -std=gnu++17
   INCLUDES = -I/workspaces/rapid_parser -I/workspaces/rapid_parser/generated -isystem /workspaces/rapid_parser/build/antlr4_runtime/src/antlr4_runtime/runtime/Cpp/runtime/src
   OBJECT_DIR = CMakeFiles/rapid_parser.dir
   OBJECT_FILE_DIR = CMakeFiles/rapid_parser.dir/generated
 
-build CMakeFiles/rapid_parser.dir/generated/RapidParser.cpp.o: CXX_COMPILER__rapid_parser_unscanned_ /workspaces/rapid_parser/generated/RapidParser.cpp || cmake_object_order_depends_target_rapid_parser
+build CMakeFiles/rapid_parser.dir/generated/RapidParser.cpp.o: CXX_COMPILER__rapid_parser_unscanned_Debug /workspaces/rapid_parser/generated/RapidParser.cpp || cmake_object_order_depends_target_rapid_parser
   DEFINES = -DANTLR4CPP_STATIC
   DEP_FILE = CMakeFiles/rapid_parser.dir/generated/RapidParser.cpp.o.d
-  FLAGS = -std=gnu++17
+  FLAGS = -g -std=gnu++17
   INCLUDES = -I/workspaces/rapid_parser -I/workspaces/rapid_parser/generated -isystem /workspaces/rapid_parser/build/antlr4_runtime/src/antlr4_runtime/runtime/Cpp/runtime/src
   OBJECT_DIR = CMakeFiles/rapid_parser.dir
   OBJECT_FILE_DIR = CMakeFiles/rapid_parser.dir/generated
 
-build CMakeFiles/rapid_parser.dir/generated/RapidBaseVisitor.cpp.o: CXX_COMPILER__rapid_parser_unscanned_ /workspaces/rapid_parser/generated/RapidBaseVisitor.cpp || cmake_object_order_depends_target_rapid_parser
+build CMakeFiles/rapid_parser.dir/generated/RapidBaseVisitor.cpp.o: CXX_COMPILER__rapid_parser_unscanned_Debug /workspaces/rapid_parser/generated/RapidBaseVisitor.cpp || cmake_object_order_depends_target_rapid_parser
   DEFINES = -DANTLR4CPP_STATIC
   DEP_FILE = CMakeFiles/rapid_parser.dir/generated/RapidBaseVisitor.cpp.o.d
-  FLAGS = -std=gnu++17
+  FLAGS = -g -std=gnu++17
   INCLUDES = -I/workspaces/rapid_parser -I/workspaces/rapid_parser/generated -isystem /workspaces/rapid_parser/build/antlr4_runtime/src/antlr4_runtime/runtime/Cpp/runtime/src
   OBJECT_DIR = CMakeFiles/rapid_parser.dir
   OBJECT_FILE_DIR = CMakeFiles/rapid_parser.dir/generated
 
-build CMakeFiles/rapid_parser.dir/generated/RapidVisitor.cpp.o: CXX_COMPILER__rapid_parser_unscanned_ /workspaces/rapid_parser/generated/RapidVisitor.cpp || cmake_object_order_depends_target_rapid_parser
+build CMakeFiles/rapid_parser.dir/generated/RapidVisitor.cpp.o: CXX_COMPILER__rapid_parser_unscanned_Debug /workspaces/rapid_parser/generated/RapidVisitor.cpp || cmake_object_order_depends_target_rapid_parser
   DEFINES = -DANTLR4CPP_STATIC
   DEP_FILE = CMakeFiles/rapid_parser.dir/generated/RapidVisitor.cpp.o.d
-  FLAGS = -std=gnu++17
+  FLAGS = -g -std=gnu++17
   INCLUDES = -I/workspaces/rapid_parser -I/workspaces/rapid_parser/generated -isystem /workspaces/rapid_parser/build/antlr4_runtime/src/antlr4_runtime/runtime/Cpp/runtime/src
   OBJECT_DIR = CMakeFiles/rapid_parser.dir
   OBJECT_FILE_DIR = CMakeFiles/rapid_parser.dir/generated
@@ -110,7 +123,8 @@ build CMakeFiles/rapid_parser.dir/generated/RapidVisitor.cpp.o: CXX_COMPILER__ra
 #############################################
 # Link the executable rapid_parser
 
-build rapid_parser: CXX_EXECUTABLE_LINKER__rapid_parser_ CMakeFiles/rapid_parser.dir/main.cpp.o CMakeFiles/rapid_parser.dir/generated/RapidLexer.cpp.o CMakeFiles/rapid_parser.dir/generated/RapidParser.cpp.o CMakeFiles/rapid_parser.dir/generated/RapidBaseVisitor.cpp.o CMakeFiles/rapid_parser.dir/generated/RapidVisitor.cpp.o | antlr4_runtime/src/antlr4_runtime/runtime/Cpp/runtime/libantlr4-runtime.a || antlr4_runtime-build_static
+build rapid_parser: CXX_EXECUTABLE_LINKER__rapid_parser_Debug CMakeFiles/rapid_parser.dir/main.cpp.o CMakeFiles/rapid_parser.dir/Interpreter.cpp.o CMakeFiles/rapid_parser.dir/generated/RapidLexer.cpp.o CMakeFiles/rapid_parser.dir/generated/RapidParser.cpp.o CMakeFiles/rapid_parser.dir/generated/RapidBaseVisitor.cpp.o CMakeFiles/rapid_parser.dir/generated/RapidVisitor.cpp.o | antlr4_runtime/src/antlr4_runtime/runtime/Cpp/runtime/libantlr4-runtime.a || antlr4_runtime-build_static
+  FLAGS = -g
   LINK_LIBRARIES = antlr4_runtime/src/antlr4_runtime/runtime/Cpp/runtime/libantlr4-runtime.a
   OBJECT_DIR = CMakeFiles/rapid_parser.dir
   POST_BUILD = :
@@ -169,8 +183,8 @@ build antlr4_runtime/src/antlr4_runtime-stamp/antlr4_runtime-build | ${cmake_nin
 #############################################
 # Custom command for antlr4_runtime/src/antlr4_runtime-stamp/antlr4_runtime-configure
 
-build antlr4_runtime/src/antlr4_runtime-stamp/antlr4_runtime-configure | ${cmake_ninja_workdir}antlr4_runtime/src/antlr4_runtime-stamp/antlr4_runtime-configure: CUSTOM_COMMAND antlr4_runtime/tmp/antlr4_runtime-cfgcmd.txt antlr4_runtime/tmp/antlr4_runtime-cache-.cmake antlr4_runtime/src/antlr4_runtime-stamp/antlr4_runtime-patch
-  COMMAND = cd /workspaces/rapid_parser/build/antlr4_runtime/src/antlr4_runtime/runtime/Cpp && /usr/bin/cmake -GNinja -C/workspaces/rapid_parser/build/antlr4_runtime/tmp/antlr4_runtime-cache-.cmake -S /workspaces/rapid_parser/build/antlr4_runtime/src/antlr4_runtime/runtime/Cpp -B /workspaces/rapid_parser/build/antlr4_runtime/src/antlr4_runtime/runtime/Cpp && /usr/bin/cmake -E touch /workspaces/rapid_parser/build/antlr4_runtime/src/antlr4_runtime-stamp/antlr4_runtime-configure
+build antlr4_runtime/src/antlr4_runtime-stamp/antlr4_runtime-configure | ${cmake_ninja_workdir}antlr4_runtime/src/antlr4_runtime-stamp/antlr4_runtime-configure: CUSTOM_COMMAND antlr4_runtime/tmp/antlr4_runtime-cfgcmd.txt antlr4_runtime/tmp/antlr4_runtime-cache-Debug.cmake antlr4_runtime/src/antlr4_runtime-stamp/antlr4_runtime-patch
+  COMMAND = cd /workspaces/rapid_parser/build/antlr4_runtime/src/antlr4_runtime/runtime/Cpp && /usr/bin/cmake -GNinja -C/workspaces/rapid_parser/build/antlr4_runtime/tmp/antlr4_runtime-cache-Debug.cmake -S /workspaces/rapid_parser/build/antlr4_runtime/src/antlr4_runtime/runtime/Cpp -B /workspaces/rapid_parser/build/antlr4_runtime/src/antlr4_runtime/runtime/Cpp && /usr/bin/cmake -E touch /workspaces/rapid_parser/build/antlr4_runtime/src/antlr4_runtime-stamp/antlr4_runtime-configure
   DESC = Performing configure step for 'antlr4_runtime'
   restat = 1
 
