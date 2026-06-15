@@ -1,0 +1,43 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/workspaces/rapid_parser/build/CMakeFiles/antlr4_runtime"
+		},
+		{
+			"file" : "/workspaces/rapid_parser/build/CMakeFiles/antlr4_runtime.rule"
+		},
+		{
+			"file" : "/workspaces/rapid_parser/build/CMakeFiles/antlr4_runtime-complete.rule"
+		},
+		{
+			"file" : "/workspaces/rapid_parser/build/antlr4_runtime/src/antlr4_runtime-stamp/antlr4_runtime-build.rule"
+		},
+		{
+			"file" : "/workspaces/rapid_parser/build/antlr4_runtime/src/antlr4_runtime-stamp/antlr4_runtime-configure.rule"
+		},
+		{
+			"file" : "/workspaces/rapid_parser/build/antlr4_runtime/src/antlr4_runtime-stamp/antlr4_runtime-download.rule"
+		},
+		{
+			"file" : "/workspaces/rapid_parser/build/antlr4_runtime/src/antlr4_runtime-stamp/antlr4_runtime-install.rule"
+		},
+		{
+			"file" : "/workspaces/rapid_parser/build/antlr4_runtime/src/antlr4_runtime-stamp/antlr4_runtime-mkdir.rule"
+		},
+		{
+			"file" : "/workspaces/rapid_parser/build/antlr4_runtime/src/antlr4_runtime-stamp/antlr4_runtime-patch.rule"
+		},
+		{
+			"file" : "/workspaces/rapid_parser/build/antlr4_runtime/src/antlr4_runtime-stamp/antlr4_runtime-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"antlr4_runtime"
+		],
+		"name" : "antlr4_runtime"
+	}
+}

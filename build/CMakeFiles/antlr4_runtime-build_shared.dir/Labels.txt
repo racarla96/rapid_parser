@@ -1,0 +1,6 @@
+# Target labels
+ antlr4_runtime
+# Source files and their labels
+/workspaces/rapid_parser/build/CMakeFiles/antlr4_runtime-build_shared
+/workspaces/rapid_parser/build/CMakeFiles/antlr4_runtime-build_shared.rule
+/workspaces/rapid_parser/build/antlr4_runtime/src/antlr4_runtime-stamp/antlr4_runtime-build_shared.rule

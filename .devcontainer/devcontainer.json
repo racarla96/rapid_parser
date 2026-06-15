@@ -1,0 +1,30 @@
+{
+  "name": "rapid_parser (ANTLR4 + C++17, headless)",
+  "build": {
+    "context": "..",
+    "dockerfile": "Dockerfile"
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.cpptools",
+        "ms-vscode.cmake-tools",
+        "mike-lischke.vscode-antlr4"
+      ],
+      "settings": {
+        "cmake.configureOnOpen": true,
+        "cmake.generator": "Ninja",
+        "antlr4.generation": {
+          "mode": "external",
+          "outputDir": "generated",
+          "language": "Cpp",
+          "listeners": false,
+          "visitors": true
+        }
+      }
+    }
+  },
+
+  "remoteUser": "ubuntu"
+}
